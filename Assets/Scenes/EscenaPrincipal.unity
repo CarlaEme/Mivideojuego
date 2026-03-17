@@ -493,6 +493,7 @@ GameObject:
   - component: {fileID: 1394056253}
   - component: {fileID: 1394056255}
   - component: {fileID: 1394056256}
+  - component: {fileID: 1394056257}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -570,7 +571,7 @@ Rigidbody2D:
     serializedVersion: 2
     m_Bits: 0
   m_Interpolate: 0
-  m_SleepingMode: 1
+  m_SleepingMode: 0
   m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!4 &1394056252
@@ -692,6 +693,7 @@ MonoBehaviour:
   controladorSuelo: {fileID: 1823857884}
   rb: {fileID: 1394056251}
   animator: {fileID: 1394056253}
+  scriptDash: {fileID: 1394056257}
 --- !u!114 &1394056256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -707,6 +709,22 @@ MonoBehaviour:
   controladorDisparo: {fileID: 1612919054}
   balaPrefab: {fileID: 609656026641512690, guid: 45ede346749472e45b3610c67e55be9c, type: 3}
   velocidadBala: 20
+--- !u!114 &1394056257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394056249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e22065f1aec83b41bd867b405522f55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MecanicaDash
+  fuerzaDash: 20
+  tiempoDash: 0.5
+  esperaEntreDashes: 0
+  estaHaciendoDash: 0
 --- !u!1 &1612919053
 GameObject:
   m_ObjectHideFlags: 0
