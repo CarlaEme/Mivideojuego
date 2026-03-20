@@ -710,6 +710,10 @@ MonoBehaviour:
   rb: {fileID: 1394056251}
   animator: {fileID: 1394056253}
   scriptDash: {fileID: 1394056257}
+  spriteJugador: {fileID: 1394056254}
+  colisionadorJugador: {fileID: 1394056250}
+  factorReduccionAltura: 0.5
+  escalaVisualY: 0.6
 --- !u!114 &1394056256
 MonoBehaviour:
   m_ObjectHideFlags: 0
