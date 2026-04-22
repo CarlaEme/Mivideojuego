@@ -1,27 +1,45 @@
 using UnityEngine;
+using UnityEngine.SceneManagement; // Necesario para gestionar escenas si decides volver al menú
+
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public int monedasTotales;
-    public int nivelMaximoAlcanzado; // Nueva variable
+    public int nivelMaximoAlcanzado;
 
     void Awake()
-{
-    if (instance == null)
     {
-        instance = this;
-        // Esta línea es MAGIA: hace que el GameManager no muera 
-        // cuando cambies de la EscenaPrincipal al Nivel2
-        DontDestroyOnLoad(gameObject); 
-        CargarProgreso();
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject); 
+            CargarProgreso();
+        }
+        else
+        {
+            Destroy(gameObject);
+
+            
+        }
     }
-    else
+
+    // --- SECCIÓN DE CONTROL ---
+    void Update()
     {
-        // Si ya existe uno, destruimos el nuevo para que no haya dos contadores
-        Destroy(gameObject);
+        // Si presionas la tecla "Escape", el juego se cierra
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SalirDelJuego();
+        }
     }
-}
+
+    // Esta función sirve tanto para la tecla ESC como para un botón de "Salir"
+    public void SalirDelJuego()
+    {
+        Debug.Log("Cerrando aplicación...");
+        Application.Quit(); 
+    }
 
     // --- SECCIÓN DE MONEDAS ---
     public void SumarMoneda()
@@ -33,7 +51,6 @@ public class GameManager : MonoBehaviour
     // --- SECCIÓN DE NIVELES ---
     public void DesbloquearSiguienteNivel(int numeroDeNivel)
     {
-        // Solo actualizamos si el nivel que pasamos es mayor al que ya teníamos guardado
         if (numeroDeNivel > nivelMaximoAlcanzado)
         {
             nivelMaximoAlcanzado = numeroDeNivel;
@@ -46,13 +63,13 @@ public class GameManager : MonoBehaviour
     public void GuardarProgreso()
     {
         PlayerPrefs.SetInt("MonedasGuardadas", monedasTotales);
-        PlayerPrefs.SetInt("NivelMaximo", nivelMaximoAlcanzado); // Guardamos el nivel
+        PlayerPrefs.SetInt("NivelMaximo", nivelMaximoAlcanzado);
         PlayerPrefs.Save(); 
     }
 
     void CargarProgreso()
     {
         monedasTotales = PlayerPrefs.GetInt("MonedasGuardadas", 0);
-        nivelMaximoAlcanzado = PlayerPrefs.GetInt("NivelMaximo", 1); // Por defecto empieza en el 1
+        nivelMaximoAlcanzado = PlayerPrefs.GetInt("NivelMaximo", 1);
     }
 }

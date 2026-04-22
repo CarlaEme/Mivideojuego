@@ -1,17 +1,34 @@
 using UnityEngine;
-using Firebase.Firestore; // Esta es la línea que resuelve tu error
+using Firebase.Firestore;
 using Firebase.Extensions;
 using System.Collections.Generic;
 
 public class FirebaseManager : MonoBehaviour
 {
+    // --- ESTA ES LA PARTE NUEVA PARA EL SINGLETON ---
+    public static FirebaseManager instance; 
+
     private FirebaseFirestore db;
-    private string documentPath = "player1"; // Debe coincidir con tu consola de Firebase
+    private string documentPath = "player1"; 
     public int monedasActuales = 0; 
+
+    void Awake()
+    {
+        // Si no hay instancia, esta es la principal
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject); // Evita que se destruya al cambiar de nivel
+        }
+        else
+        {
+            Destroy(gameObject); // Si ya existe uno, destruye el duplicado
+        }
+    }
+    // -----------------------------------------------
 
     void Start()
     {
-        // Esto inicializa Firebase en Unity de forma segura
         Firebase.FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
             var dependencyStatus = task.Result;
             if (dependencyStatus == Firebase.DependencyStatus.Available)
@@ -27,11 +44,16 @@ public class FirebaseManager : MonoBehaviour
         });
     }
 
-    // Esta función se llama desde tu script de la moneda
     public void SumarMoneda()
     {
         monedasActuales++;
         ActualizarMonedasEnNube(monedasActuales);
+
+        // Opcional: Avisar al GameManager local para que la UI se actualice
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.monedasTotales = monedasActuales;
+        }
     }
 
     private void ActualizarMonedasEnNube(int cantidad)
@@ -56,35 +78,32 @@ public class FirebaseManager : MonoBehaviour
             if (snapshot.Exists) {
                 monedasActuales = snapshot.GetValue<int>("monedas");
                 Debug.Log("Monedas cargadas de la nube: " + monedasActuales);
+                
+                // Sincronizamos con el GameManager local al cargar
+                if (GameManager.instance != null)
+                {
+                    GameManager.instance.monedasTotales = monedasActuales;
+                }
             }
         });
     }
 
-
-
-// Función para marcar un nivel como completado (true)
-public void GuardarNivelCompletado(string nombreNivel)
-{
-    if (db == null) return;
-
-    DocumentReference docRef = db.Collection("players").Document(documentPath);
-    
-    // Creamos un diccionario con el nombre del nivel (ej: "nivel1") y el valor true
-    Dictionary<string, object> actualizacionNivel = new Dictionary<string, object>
+    public void GuardarNivelCompletado(string nombreNivel)
     {
-        { nombreNivel, true }
-    };
+        if (db == null) return;
 
-    docRef.UpdateAsync(actualizacionNivel).ContinueWithOnMainThread(task => {
-        if (task.IsCompleted) 
+        DocumentReference docRef = db.Collection("players").Document(documentPath);
+        
+        Dictionary<string, object> actualizacionNivel = new Dictionary<string, object>
         {
-            Debug.Log("¡Progreso de " + nombreNivel + " guardado en la nube!");
-        }
-        else 
-        {
-            Debug.LogError("Error al guardar nivel: " + task.Exception);
-        }
-    });
-}
+            { nombreNivel, true }
+        };
 
+        docRef.UpdateAsync(actualizacionNivel).ContinueWithOnMainThread(task => {
+            if (task.IsCompleted) 
+            {
+                Debug.Log("¡Progreso de " + nombreNivel + " guardado en la nube!");
+            }
+        });
+    }
 }

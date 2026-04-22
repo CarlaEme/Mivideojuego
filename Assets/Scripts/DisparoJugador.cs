@@ -1,34 +1,42 @@
 using UnityEngine;
+using UnityEngine.EventSystems; // 1. IMPORTANTE: Añade esta línea para detectar la UI
 
 public class DisparoJugador : MonoBehaviour
 {
     [Header("Configuracion de Disparo")]
-    public Transform controladorDisparo; // El punto que creamos
-    public GameObject balaPrefab;        // El molde de la bala
+    public Transform controladorDisparo; 
+    public GameObject balaPrefab;        
     public float velocidadBala = 20f;
 
-    void Update()
+   
+   void Update()
+{
+    if (Input.GetButtonDown("Fire1") || Input.GetKeyDown(KeyCode.F))
     {
-        // Detectar evento de teclado (Fire1 = Clic izq o Ctrl izq, o tecla F)
-        if (Input.GetButtonDown("Fire1") || Input.GetKeyDown(KeyCode.F))
+        // Añadimos una verificación extra: Solo bloquea si el EventSystem existe
+        if (EventSystem.current != null) 
         {
-            Disparar();
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                Debug.Log("Clic bloqueado por la Interfaz");
+                return; 
+            }
         }
+
+        Disparar();
     }
+}
+   
+   
+   
 
     void Disparar()
     {
         GameObject bala = Instantiate(balaPrefab, controladorDisparo.position, controladorDisparo.rotation);
         
-        // --- SOLUCIÓN PARA EL TAMAÑO ---
-        // Obtenemos el sentido del personaje (1 o -1)
         float sentidoX = transform.localScale.x;
-
-        // Aquí definimos el tamaño exacto que queremos (ejemplo: 0.2)
-        // Multiplicamos el tamaño por el sentido para que se voltee
         float tamañoDeseado = 0.4f; 
         bala.transform.localScale = new Vector3(tamañoDeseado * sentidoX, tamañoDeseado, 1f);
-        // -------------------------------
 
         Rigidbody2D rb = bala.GetComponent<Rigidbody2D>();
         rb.linearVelocity = new Vector2(sentidoX * velocidadBala, rb.linearVelocity.y);
@@ -36,3 +44,5 @@ public class DisparoJugador : MonoBehaviour
         Destroy(bala, 2f);
     }
 }
+
+
